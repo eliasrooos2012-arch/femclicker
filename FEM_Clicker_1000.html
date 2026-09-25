@@ -1,0 +1,866 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111113">
+<title>FEM CLICKER 1000</title>
+<style>
+:root{
+  --bg:#0c0c0f;
+  --bg-2:#111116;
+  --panel:#15151a;
+  --panel-2:#19191f;
+  --line:#2a2a31;
+  --text:#f5f5f7;
+  --muted:#9999a5;
+  --pink:#ff5bbd;
+  --pink-soft:#ff9bd8;
+  --purple:#8f7bff;
+  --green:#73d99b;
+  --yellow:#ffd166;
+  --danger:#ff6b7c;
+  --radius:16px;
+  --space:18px;
+  --shadow:0 18px 45px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text)}
+body{
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.45;
+  overflow-x:hidden;
+}
+button,input{font:inherit}
+button{border:0}
+button:active{transform:translateY(1px) scale(.985)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+.app{
+  width:min(1180px,calc(100% - 28px));
+  margin:0 auto;
+  padding:24px 0 50px;
+}
+.header{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:20px;
+  padding:4px 0 24px;
+  border-bottom:1px solid var(--line);
+}
+.brand h1{
+  margin:0;
+  font-size:clamp(2rem,5vw,4.5rem);
+  letter-spacing:-.055em;
+  line-height:.95;
+}
+.brand h1 span{color:var(--pink)}
+.brand p{
+  margin:9px 0 0;
+  color:var(--muted);
+  font-size:.95rem;
+}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn{
+  background:var(--panel-2);
+  color:var(--text);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:9px 13px;
+  cursor:pointer;
+  transition:.18s ease;
+}
+.btn:hover{border-color:#484852;transform:translateY(-1px)}
+.btn.primary{background:var(--pink);color:#12090f;border-color:var(--pink);font-weight:800}
+.btn.ghost{background:transparent}
+.btn.danger{color:#ff9eaa}
+.layout{
+  display:grid;
+  grid-template-columns:360px 1fr;
+  gap:18px;
+  margin-top:18px;
+}
+.panel{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+.left{padding:22px;display:flex;flex-direction:column;min-height:680px}
+.money-label{
+  text-align:center;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  font-size:.72rem;
+  font-weight:700;
+}
+.money{
+  text-align:center;
+  font-size:clamp(2.2rem,6vw,3.6rem);
+  font-weight:900;
+  letter-spacing:-.045em;
+  margin-top:2px;
+  overflow-wrap:anywhere;
+}
+.rate{
+  text-align:center;
+  color:var(--muted);
+  font-size:.84rem;
+  min-height:22px;
+}
+.click-zone{
+  display:grid;
+  place-items:center;
+  padding:22px 0 20px;
+}
+.clicker{
+  width:230px;height:230px;border-radius:50%;
+  background:#202026;
+  border:1px solid #35353e;
+  color:#fff;
+  cursor:pointer;
+  box-shadow:
+    0 0 0 11px rgba(255,91,189,.05),
+    0 0 0 22px rgba(255,91,189,.025),
+    0 20px 55px rgba(0,0,0,.45);
+  transition:transform .12s ease,box-shadow .2s ease,border-color .2s ease;
+  user-select:none;
+  position:relative;
+}
+.clicker::before{
+  content:"";
+  position:absolute;inset:12px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.08);
+}
+.clicker:hover{
+  transform:scale(1.025);
+  border-color:#555562;
+  box-shadow:0 0 0 11px rgba(255,91,189,.08),0 20px 55px rgba(0,0,0,.5);
+}
+.clicker.active{transform:scale(.955)}
+.clicker small{display:block;color:var(--pink-soft);font-size:.8rem;margin-bottom:4px}
+.clicker strong{display:block;font-size:2rem;letter-spacing:-.04em}
+.clicker em{display:block;font-style:normal;color:var(--muted);font-size:.75rem;margin-top:8px}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+  margin-top:auto;
+}
+.stat{
+  background:var(--bg-2);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px;
+}
+.stat span{display:block;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}
+.stat strong{display:block;font-size:1.1rem;margin-top:2px}
+.content{padding:14px}
+.tabs{
+  display:flex;
+  gap:6px;
+  overflow:auto;
+  padding:4px;
+  border-bottom:1px solid var(--line);
+}
+.tab{
+  flex:0 0 auto;
+  background:transparent;
+  color:var(--muted);
+  border-radius:9px;
+  padding:10px 13px;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.tab:hover{color:var(--text)}
+.tab.active{background:var(--panel-2);color:var(--text)}
+.page{display:none;padding:18px 8px 8px}
+.page.active{display:block}
+.section-head{
+  display:flex;justify-content:space-between;align-items:end;gap:12px;
+  margin-bottom:12px;
+}
+.section-head h2{margin:0;font-size:1.15rem;letter-spacing:-.02em}
+.section-head p{margin:2px 0 0;color:var(--muted);font-size:.83rem}
+.list{display:grid;gap:8px}
+.item{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:12px;
+  align-items:center;
+  background:var(--bg-2);
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:13px;
+}
+.item h3{margin:0;font-size:.98rem}
+.item p{margin:4px 0 0;color:var(--muted);font-size:.78rem}
+.buy{
+  min-width:108px;
+  padding:10px 11px;
+  border-radius:9px;
+  background:var(--pink);
+  color:#160b13;
+  cursor:pointer;
+  font-weight:800;
+}
+.buy:disabled{
+  background:#28282f;
+  color:#666671;
+  cursor:not-allowed;
+}
+.meta{
+  margin-top:5px;
+  font-size:.72rem;
+  color:#74747e;
+}
+.badge{
+  display:inline-flex;align-items:center;
+  padding:3px 7px;border:1px solid var(--line);border-radius:999px;
+  color:var(--muted);font-size:.68rem;margin-left:5px;
+}
+.card{
+  background:var(--bg-2);
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:14px;
+  margin-bottom:8px;
+}
+.card strong{font-size:.94rem}
+.card p{color:var(--muted);font-size:.8rem;margin:5px 0 0}
+.progress{
+  height:7px;background:#25252c;border-radius:999px;overflow:hidden;margin-top:10px;
+}
+.progress-bar{height:100%;width:0;background:var(--pink);transition:width .25s ease}
+.achievement{
+  display:grid;grid-template-columns:36px 1fr auto;gap:10px;align-items:center;
+  background:var(--bg-2);border:1px solid var(--line);border-radius:12px;
+  padding:11px;margin-bottom:8px;opacity:.45;
+}
+.achievement.unlocked{opacity:1;border-color:#5b3150}
+.ach-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:#25252c}
+.achievement small{display:block;color:var(--muted);font-size:.72rem}
+.pet{
+  display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;
+  background:var(--bg-2);border:1px solid var(--line);border-radius:13px;padding:12px;margin-bottom:8px;
+}
+.pet-face{font-size:1.7rem}
+.pet h3{margin:0;font-size:.95rem}
+.pet p{margin:3px 0 0;color:var(--muted);font-size:.77rem}
+.quest{
+  background:var(--bg-2);border:1px solid var(--line);border-radius:13px;padding:13px;margin-bottom:8px
+}
+.quest-row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.quest h3{margin:0;font-size:.92rem}
+.quest small{color:var(--muted)}
+.codebox{display:flex;gap:7px;margin-top:8px}
+.codebox input{
+  min-width:0;flex:1;
+  background:#0e0e12;color:var(--text);
+  border:1px solid var(--line);border-radius:9px;padding:10px 11px;
+}
+.notice{
+  position:fixed;left:50%;bottom:20px;transform:translateX(-50%);
+  background:#1a1a20;border:1px solid #393943;color:var(--text);
+  padding:11px 14px;border-radius:11px;box-shadow:var(--shadow);
+  z-index:20;max-width:calc(100% - 30px);font-size:.84rem;
+}
+.float{
+  position:fixed;pointer-events:none;z-index:15;
+  color:var(--pink-soft);font-weight:900;font-size:1.05rem;
+  animation:floatUp .7s ease-out forwards;
+}
+.float.critical{color:var(--yellow);font-size:1.3rem}
+.event{
+  position:fixed;top:16px;left:50%;transform:translateX(-50%);
+  width:min(560px,calc(100% - 30px));
+  background:#16161b;border:1px solid #4a3143;
+  border-radius:14px;padding:15px 17px;z-index:25;box-shadow:var(--shadow);
+  cursor:pointer;
+}
+.event strong{display:block}
+.event span{display:block;color:var(--muted);font-size:.8rem;margin-top:3px}
+.hidden{display:none!important}
+.footer{
+  text-align:center;color:#6f6f79;font-size:.72rem;margin-top:18px
+}
+@keyframes floatUp{
+  from{opacity:1;transform:translate(-50%,0)}
+  to{opacity:0;transform:translate(-50%,-78px)}
+}
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .left{min-height:auto}
+  .stats{margin-top:10px}
+}
+@media(max-width:560px){
+  .app{width:min(100% - 18px,1180px);padding-top:12px}
+  .header{align-items:flex-start;flex-direction:column}
+  .header-actions{justify-content:flex-start}
+  .content{padding:8px}
+  .page{padding:15px 2px 4px}
+  .item{grid-template-columns:1fr}
+  .buy{width:100%}
+  .clicker{width:205px;height:205px}
+}
+</style>
+</head>
+<body>
+<main class="app" id="game">
+  <header class="header">
+    <div class="brand">
+      <h1>FEM <span>CLICKER</span> 1000</h1>
+      <p>click. upgrade. become ridiculously powerful.</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn" id="saveBtn">Save</button>
+      <button class="btn" id="fullscreenBtn">Fullscreen</button>
+      <button class="btn danger" id="resetBtn">Reset</button>
+    </div>
+  </header>
+
+  <section class="layout" aria-label="Game">
+    <aside class="panel left">
+      <div class="money-label">Femcoins</div>
+      <div class="money" id="money">0</div>
+      <div class="rate" id="rate">+1 / click</div>
+
+      <div class="click-zone">
+        <button class="clicker" id="clicker" aria-label="Click for Femcoins">
+          <small>FEM</small>
+          <strong>CLICK</strong>
+          <em>keep going</em>
+        </button>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span>Per click</span><strong id="perClick">1</strong></div>
+        <div class="stat"><span>Auto / sec</span><strong id="autoRate">0</strong></div>
+        <div class="stat"><span>Total clicks</span><strong id="clicks">0</strong></div>
+        <div class="stat"><span>Multiplier</span><strong id="multiplier">1×</strong></div>
+      </div>
+    </aside>
+
+    <section class="panel content">
+      <nav class="tabs" aria-label="Game tabs">
+        <button class="tab active" data-tab="upgrades">Upgrades</button>
+        <button class="tab" data-tab="quests">Quests</button>
+        <button class="tab" data-tab="pets">Pets</button>
+        <button class="tab" data-tab="achievements">Achievements</button>
+        <button class="tab" data-tab="statsPage">Stats</button>
+      </nav>
+
+      <div class="page active" id="upgrades">
+        <div class="section-head">
+          <div>
+            <h2>Upgrades</h2>
+            <p>Spend femcoins to make every click hit harder.</p>
+          </div>
+          <span class="badge" id="shopCount">0 bought</span>
+        </div>
+        <div class="list" id="upgradeList"></div>
+
+        <div class="section-head" style="margin-top:22px">
+          <div>
+            <h2>Secret code</h2>
+            <p>Some people would call this cheating.</p>
+          </div>
+        </div>
+        <div class="codebox">
+          <input id="codeInput" placeholder="enter a code" autocomplete="off">
+          <button class="btn primary" id="codeBtn">Redeem</button>
+        </div>
+      </div>
+
+      <div class="page" id="quests">
+        <div class="section-head">
+          <div>
+            <h2>Quests</h2>
+            <p>Small goals, free rewards.</p>
+          </div>
+        </div>
+        <div id="questList"></div>
+      </div>
+
+      <div class="page" id="pets">
+        <div class="section-head">
+          <div>
+            <h2>Pets</h2>
+            <p>Collect passive boosts.</p>
+          </div>
+        </div>
+        <div id="petList"></div>
+      </div>
+
+      <div class="page" id="achievements">
+        <div class="section-head">
+          <div>
+            <h2>Achievements</h2>
+            <p>Milestones saved to your browser.</p>
+          </div>
+        </div>
+        <div id="achievementList"></div>
+      </div>
+
+      <div class="page" id="statsPage">
+        <div class="section-head">
+          <div>
+            <h2>Stats</h2>
+            <p>Your completely unnecessary clicker statistics.</p>
+          </div>
+        </div>
+        <div class="card"><strong>Lifetime femcoins</strong><p id="lifeCoins">0</p></div>
+        <div class="card"><strong>Critical clicks</strong><p id="critClicks">0</p></div>
+        <div class="card"><strong>Best single click</strong><p id="bestClick">1</p></div>
+        <div class="card"><strong>Time played</strong><p id="timePlayed">0m</p></div>
+        <div class="card"><strong>Current rank</strong><p id="rank">Beginner</p></div>
+      </div>
+    </section>
+  </section>
+
+  <div class="footer">FEM CLICKER 1000 · local save enabled · no external libraries</div>
+</main>
+
+<div class="notice hidden" id="notice"></div>
+<div class="event hidden" id="event">
+  <strong id="eventTitle"></strong>
+  <span id="eventText"></span>
+</div>
+
+<script>
+(() => {
+  const SAVE_KEY = "fem-clicker-1000-save";
+
+  const upgrades = [
+    {id:"soft", name:"fem Click", desc:"+1 femcoin per click", base:20, scale:1.16, effect:1, type:"click"},
+    {id:"pink", name:"joel", desc:"+4 femcoins per click", base:90, scale:1.18, effect:4, type:"click"},
+    {id:"hoodie", name:"fredrik", desc:"+15 femcoins per click", base:450, scale:1.22, effect:15, type:"click"},
+    {id:"sparkle", name:"vape", desc:"+65 femcoins per click", base:2200, scale:1.25, effect:65, type:"click"},
+    {id:"bot", name:"Fem Bot", desc:"+3 femcoins per second", base:150, scale:1.19, effect:3, type:"auto"},
+    {id:"stream", name:"vapeshop", desc:"+18 femcoins per second", base:900, scale:1.22, effect:18, type:"auto"},
+    {id:"factory", name:"Fem Factory", desc:"+100 femcoins per second", base:5500, scale:1.24, effect:100, type:"auto"},
+    {id:"core", name:"1000% Core", desc:"+500 femcoins per second", base:36000, scale:1.27, effect:500, type:"auto"}
+  ];
+
+  const pets = [
+    {id:"kitty", name:"furry femboy", icon:"🐈", cost:2000, bonus:1.10, text:"10% total income boost"},
+    {id:"bunny", name:"femboy niro", icon:"🐇", cost:12000, bonus:1.25, text:"25% total income boost"},
+    {id:"shark", name:"jönz", icon:"🦈", cost:80000, bonus:1.50, text:"50% total income boost"}
+  ];
+
+  const achievements = [
+    {id:"a1", title:"First click", text:"Make your first click.", check:s=>s.clicks>=1},
+    {id:"a2", title:"Actually playing", text:"Reach 100 clicks.", check:s=>s.clicks>=100},
+    {id:"a3", title:"Five digits", text:"Reach 10,000 femcoins in the bank.", check:s=>s.money>=10000},
+    {id:"a4", title:"Machine", text:"Generate 100 femcoins per second.", check:s=>getAutoPerSec(s)>=100},
+    {id:"a5", title:"Pink economy", text:"Own 20 upgrades.", check:s=>totalUpgrades(s)>=20},
+    {id:"a6", title:"1000 CLUB", text:"Reach 1,000 total clicks.", check:s=>s.clicks>=1000}
+  ];
+
+  const quests = [
+    {id:"q1", title:"Warm-up", text:"Click 25 times.", target:25, type:"clicks", reward:100},
+    {id:"q2", title:"Pocket change", text:"Earn 2,500 lifetime femcoins.", target:2500, type:"lifetime", reward:400},
+    {id:"q3", title:"Builder", text:"Buy 5 upgrades.", target:5, type:"upgrades", reward:700},
+    {id:"q4", title:"Serious business", text:"Reach 50 femcoins / second.", target:50, type:"auto", reward:2500}
+  ];
+
+  const defaultState = {
+    money:0, clicks:0, lifetime:0, critClicks:0, bestClick:1,
+    playedSeconds:0, multiplier:1, upgrades:{}, pets:{}, quests:{},
+    eventCooldown:0, lastSaved:Date.now(), bankedTime:0
+  };
+
+  let state = load();
+  let lastTick = Date.now();
+  let noticeTimer = null;
+
+  const $ = id => document.getElementById(id);
+
+  function num(n){
+    return Math.floor(n).toLocaleString();
+  }
+
+  function compact(n){
+    if(n < 1000) return Math.floor(n).toLocaleString();
+    const units = ["K","M","B","T","Qa","Qi"];
+    let value=n, i=-1;
+    while(value>=1000 && i<units.length-1){ value/=1000; i++; }
+    return value.toFixed(value<10?1:0)+units[i];
+  }
+
+  function clone(obj){ return JSON.parse(JSON.stringify(obj)); }
+
+  function load(){
+    try{
+      const raw = localStorage.getItem(SAVE_KEY);
+      if(!raw) return clone(defaultState);
+      const saved = JSON.parse(raw);
+      return Object.assign(clone(defaultState), saved, {
+        upgrades:saved.upgrades||{},
+        pets:saved.pets||{},
+        quests:saved.quests||{}
+      });
+    }catch{
+      return clone(defaultState);
+    }
+  }
+
+  function save(show=true){
+    try{
+      state.lastSaved = Date.now();
+      localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+      if(show) toast("Game saved.");
+    }catch{
+      toast("Could not save in this browser.");
+    }
+  }
+
+  function reset(){
+    if(!confirm("Reset FEM CLICKER 1000 and delete the local save?")) return;
+    localStorage.removeItem(SAVE_KEY);
+    state = clone(defaultState);
+    render();
+    toast("Save reset.");
+  }
+
+  function upgradeLevel(u){ return state.upgrades[u.id] || 0; }
+
+  function upgradeCost(u){
+    return Math.ceil(u.base * Math.pow(u.scale, upgradeLevel(u)));
+  }
+
+  function totalUpgrades(s=state){
+    return Object.values(s.upgrades).reduce((a,b)=>a+b,0);
+  }
+
+  function getClickPower(s=state){
+    let base = 1;
+    upgrades.forEach(u => {
+      if(u.type==="click") base += upgradeLevel(u) * u.effect;
+    });
+    return base * getTotalMultiplier(s);
+  }
+
+  function getAutoPerSec(s=state){
+    let base = 0;
+    upgrades.forEach(u => {
+      if(u.type==="auto") base += upgradeLevel(u) * u.effect;
+    });
+    return base * getTotalMultiplier(s);
+  }
+
+  function getPetMultiplier(s=state){
+    let m = 1;
+    pets.forEach(p => { if(s.pets[p.id]) m *= p.bonus; });
+    return m;
+  }
+
+  function getTotalMultiplier(s=state){
+    return (s.multiplier || 1) * getPetMultiplier(s);
+  }
+
+  function getRank(s=state){
+    const c=s.clicks, m=s.lifetime;
+    if(m>=1000000 || c>=100000) return "Legend";
+    if(m>=100000 || c>=10000) return "Icon";
+    if(m>=10000 || c>=1000) return "Main character";
+    if(m>=1000 || c>=100) return "Getting started";
+    return "Beginner";
+  }
+
+  function addCoins(amount, critical=false){
+    state.money += amount;
+    state.lifetime += amount;
+    if(critical){ state.critClicks++; }
+    state.bestClick = Math.max(state.bestClick, Math.floor(amount));
+  }
+
+  function doClick(e){
+    $("clicker").classList.add("active");
+    setTimeout(() => $("clicker").classList.remove("active"), 90);
+
+    let amount = getClickPower();
+    const crit = Math.random() < .08;
+    if(crit) amount *= 3;
+    addCoins(amount, crit);
+    state.clicks++;
+
+    const x = (e.clientX || window.innerWidth/2);
+    const y = (e.clientY || window.innerHeight/2);
+    floatText("+"+num(amount)+(crit?" CRIT!":""), x, y, crit);
+
+    maybeEvent();
+    checkAchievements();
+    render();
+  }
+
+  function floatText(text,x,y,critical=false){
+    const el=document.createElement("div");
+    el.className="float"+(critical?" critical":"");
+    el.textContent=text;
+    el.style.left=x+"px";
+    el.style.top=y+"px";
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),800);
+  }
+
+  function maybeEvent(){
+    if(state.clicks>0 && state.clicks%250===0){
+      state.multiplier = Math.min(5, state.multiplier * 1.05);
+      $("eventTitle").textContent="FEM SURGE";
+      $("eventText").textContent="Your global multiplier increased to "+state.multiplier.toFixed(2)+"×.";
+      $("event").classList.remove("hidden");
+      setTimeout(()=> $("event").classList.add("hidden"),5000);
+    }
+  }
+
+  function toast(msg){
+    const n=$("notice");
+    n.textContent=msg;
+    n.classList.remove("hidden");
+    clearTimeout(noticeTimer);
+    noticeTimer=setTimeout(()=>n.classList.add("hidden"),2200);
+  }
+
+  function buyUpgrade(id){
+    const u=upgrades.find(x=>x.id===id);
+    if(!u) return;
+    const cost=upgradeCost(u);
+    if(state.money<cost) return toast("Not enough femcoins.");
+    state.money-=cost;
+    state.upgrades[u.id]=upgradeLevel(u)+1;
+    toast(u.name+" upgraded.");
+    checkAchievements();
+    render();
+  }
+
+  function buyPet(id){
+    const p=pets.find(x=>x.id===id);
+    if(!p || state.pets[p.id]) return;
+    if(state.money<p.cost) return toast("Not enough femcoins.");
+    state.money-=p.cost;
+    state.pets[p.id]=true;
+    toast(p.name+" joined the crew.");
+    render();
+  }
+
+  function questValue(q){
+    if(q.type==="clicks") return state.clicks;
+    if(q.type==="lifetime") return state.lifetime;
+    if(q.type==="upgrades") return totalUpgrades();
+    if(q.type==="auto") return getAutoPerSec();
+    return 0;
+  }
+
+  function claimQuest(id){
+    const q=quests.find(x=>x.id===id);
+    if(!q || state.quests[q.id] || questValue(q)<q.target) return;
+    state.quests[q.id]=true;
+    addCoins(q.reward);
+    toast("Quest complete: +"+num(q.reward)+" femcoins.");
+    render();
+  }
+
+  function checkAchievements(){
+    const newly=[];
+    achievements.forEach(a=>{
+      if(a.check(state) && !state["achievement_"+a.id]){
+        state["achievement_"+a.id]=true;
+        newly.push(a.title);
+      }
+    });
+    if(newly.length) toast("Achievement unlocked: "+newly[0]);
+  }
+
+  function redeemCode(){
+    const input=$("codeInput");
+    const code=input.value.trim().toLowerCase();
+    if(!code) return;
+    let reward=0;
+    if(code==="fem1000") reward=1000;
+    else if(code==="pink") reward=5000;
+    else if(code==="uwu") reward=25000;
+    else if(code==="1000club"){ state.multiplier=Math.max(state.multiplier,2); toast("1000 CLUB activated. Global multiplier set to 2×."); input.value=""; render(); return; }
+    else return toast("Unknown code.");
+    addCoins(reward);
+    input.value="";
+    toast("Code redeemed: +"+num(reward)+" femcoins.");
+    render();
+  }
+
+  function render(){
+    $("money").textContent=compact(state.money);
+    $("rate").textContent="+"+compact(getClickPower())+" / click";
+    $("perClick").textContent=compact(getClickPower());
+    $("autoRate").textContent=compact(getAutoPerSec());
+    $("clicks").textContent=num(state.clicks);
+    $("multiplier").textContent=getTotalMultiplier().toFixed(getTotalMultiplier()%1?2:0)+"×";
+    $("shopCount").textContent=totalUpgrades()+" bought";
+    $("lifeCoins").textContent=num(state.lifetime);
+    $("critClicks").textContent=num(state.critClicks);
+    $("bestClick").textContent=num(state.bestClick);
+    $("timePlayed").textContent=formatTime(state.playedSeconds);
+    $("rank").textContent=getRank();
+    renderUpgrades();
+    renderQuests();
+    renderPets();
+    renderAchievements();
+  }
+
+  function renderUpgrades(){
+    const list=$("upgradeList");
+    list.innerHTML="";
+    upgrades.forEach(u=>{
+      const level=upgradeLevel(u);
+      const cost=upgradeCost(u);
+      const row=document.createElement("div");
+      row.className="item";
+      row.innerHTML=`
+        <div>
+          <h3>${u.name} <span class="badge">Lv ${level}</span></h3>
+          <p>${u.desc}</p>
+          <div class="meta">Next cost: ${compact(cost)}</div>
+        </div>
+        <button class="buy" data-buy="${u.id}" ${state.money<cost?"disabled":""}>Buy</button>
+      `;
+      list.appendChild(row);
+    });
+    list.querySelectorAll("[data-buy]").forEach(btn=>btn.addEventListener("click",()=>buyUpgrade(btn.dataset.buy)));
+  }
+
+  function renderQuests(){
+    const list=$("questList");
+    list.innerHTML="";
+    quests.forEach(q=>{
+      const value=Math.min(q.target, questValue(q));
+      const done=!!state.quests[q.id];
+      const percent=Math.round(value/q.target*100);
+      const div=document.createElement("div");
+      div.className="quest";
+      div.innerHTML=`
+        <div class="quest-row">
+          <div><h3>${q.title}</h3><small>${q.text}</small></div>
+          <button class="btn ${done?"ghost":"primary"}" data-claim="${q.id}" ${done||value<q.target?"disabled":""}>
+            ${done?"Claimed":value>=q.target?"Claim":"Locked"}
+          </button>
+        </div>
+        <div class="progress"><div class="progress-bar" style="width:${percent}%"></div></div>
+        <small>${done?"Reward collected.":num(value)+" / "+num(q.target)+" · reward "+num(q.reward)}</small>
+      `;
+      list.appendChild(div);
+    });
+    list.querySelectorAll("[data-claim]").forEach(btn=>btn.addEventListener("click",()=>claimQuest(btn.dataset.claim)));
+  }
+
+  function renderPets(){
+    const list=$("petList");
+    list.innerHTML="";
+    pets.forEach(p=>{
+      const owned=!!state.pets[p.id];
+      const div=document.createElement("div");
+      div.className="pet";
+      div.innerHTML=`
+        <div class="pet-face">${p.icon}</div>
+        <div><h3>${p.name}</h3><p>${p.text}</p></div>
+        <button class="buy" data-pet="${p.id}" ${owned||state.money<p.cost?"disabled":""}>
+          ${owned?"Owned":num(p.cost)}
+        </button>
+      `;
+      list.appendChild(div);
+    });
+    list.querySelectorAll("[data-pet]").forEach(btn=>btn.addEventListener("click",()=>buyPet(btn.dataset.pet)));
+  }
+
+  function renderAchievements(){
+    const list=$("achievementList");
+    list.innerHTML="";
+    achievements.forEach(a=>{
+      const unlocked=!!state["achievement_"+a.id] || a.check(state);
+      const div=document.createElement("div");
+      div.className="achievement"+(unlocked?" unlocked":"");
+      div.innerHTML=`
+        <div class="ach-icon">${unlocked?"✓":"•"}</div>
+        <div><strong>${a.title}</strong><small>${a.text}</small></div>
+        <small>${unlocked?"Unlocked": "Locked"}</small>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  function formatTime(sec){
+    sec=Math.floor(sec);
+    const h=Math.floor(sec/3600), m=Math.floor((sec%3600)/60), s=sec%60;
+    if(h) return h+"h "+m+"m";
+    if(m) return m+"m "+s+"s";
+    return s+"s";
+  }
+
+  // Tabs
+  document.querySelectorAll(".tab").forEach(tab=>{
+    tab.addEventListener("click",()=>{
+      document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+      document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+      tab.classList.add("active");
+      $(tab.dataset.tab).classList.add("active");
+    });
+  });
+
+  $("clicker").addEventListener("click",doClick);
+  $("saveBtn").addEventListener("click",()=>save(true));
+  $("resetBtn").addEventListener("click",reset);
+  $("codeBtn").addEventListener("click",redeemCode);
+  $("codeInput").addEventListener("keydown",e=>{if(e.key==="Enter")redeemCode();});
+
+  $("event").addEventListener("click",()=> $("event").classList.add("hidden"));
+
+  $("fullscreenBtn").addEventListener("click",async()=>{
+    try{
+      if(!document.fullscreenElement) await document.documentElement.requestFullscreen();
+      else await document.exitFullscreen();
+    }catch{
+      document.body.classList.toggle("fakeFullscreen");
+      toast("Fullscreen mode toggled.");
+    }
+  });
+
+  // Passive income + autosave.
+  setInterval(()=>{
+    const now=Date.now();
+    const elapsed=Math.max(0,Math.min(2.5,(now-lastTick)/1000));
+    lastTick=now;
+    if(elapsed>0){
+      const income=getAutoPerSec()*elapsed;
+      if(income>0) addCoins(income);
+      state.playedSeconds+=elapsed;
+      state.eventCooldown=Math.max(0,state.eventCooldown-elapsed);
+      render();
+    }
+  },1000);
+
+  setInterval(()=>save(false),15000);
+
+  document.addEventListener("visibilitychange",()=>{
+    if(document.hidden){
+      save(false);
+    }else{
+      const now=Date.now();
+      const away=Math.min(4*60*60,Math.max(0,(now-state.lastSaved)/1000));
+      const offlineIncome=getAutoPerSec()*away;
+      if(offlineIncome>0){
+        addCoins(offlineIncome);
+        toast("Welcome back. Offline income: +"+num(offlineIncome));
+      }
+      state.playedSeconds+=away;
+      lastTick=now;
+      render();
+    }
+  });
+
+  // First render.
+  checkAchievements();
+  render();
+})();
+</script>
+</body>
+</html>
